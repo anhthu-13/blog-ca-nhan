@@ -191,6 +191,22 @@ body.dark-mode .modal-content {
   background: #2a2a2a;
   color: white;
 }
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.hero .avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid white;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  margin-bottom: 20px;
+}
 
   </style>
 </head>
@@ -209,8 +225,14 @@ body.dark-mode .modal-content {
 
 
   <div class="hero">
-    <h2>Chào mừng đến với blog cá nhân!</h2>
-  </div>
+  <img src="avata.jpg" alt="Avatar của Thư" class="avatar">
+  <h2>Chào mừng đến với blog cá nhân!</h2>
+  <p class="intro">
+    Đây là nơi mình lưu giữ những suy nghĩ, trải nghiệm và bài học trong hành trình sống và học tập.<br>
+    Hy vọng bạn sẽ tìm thấy điều gì đó thú vị, hoặc ít nhất là một chút bình yên khi ghé qua.
+  </p>
+</div>
+
 
   <div class="container" id="blogCardsContainer">
     <!-- JavaScript sẽ tạo bài viết ở đây -->
