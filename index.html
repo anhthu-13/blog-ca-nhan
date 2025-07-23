@@ -252,24 +252,11 @@ body.dark-mode .modal-content {
   </div>
 
   <script>
-    const postsData = [
-      {
-        title: "Bài viết 1",
-        image: "img1.jpg",
-        summary: "Tóm tắt bài viết số 1 ở đây."
-      },
-      {
-        title: "Bài viết 2",
-        image: "img2.jpg",
-        summary: "Tóm tắt bài viết số 2 ở đây."
-      }
-      // Thêm bài viết khác
-    ];
 
     function createPostCard(post) {
       return `
         <div class="card">
-          <img src="${post.image}" alt="${post.title}" onclick="openModal('${post.title}', '${post.summary}')">
+          <img src="${post.img}" alt="${post.title}" onclick="openModal('${post.title}', '${post.summary}')">
           <div class="card-body">
             <h3>${post.title}</h3>
             <p>${post.summary}</p>
@@ -279,22 +266,22 @@ body.dark-mode .modal-content {
       `;
     }
 
-    function renderPosts() {
-      const container = document.getElementById('blogCardsContainer');
-      container.innerHTML = postsData.map(createPostCard).join('');
-    }
+    // function renderPosts() {
+    //   const container = document.getElementById('blogCardsContainer');
+    //   container.innerHTML = postsData.map(createPostCard).join('');
+    // }
 
-    function openModal(title, summary) {
-      document.getElementById('modalTitle').textContent = title;
-      document.getElementById('modalSummary').textContent = summary;
-      document.getElementById('modal').style.display = 'flex';
-    }
+    // function openModal(title, summary) {
+    //   document.getElementById('modalTitle').textContent = title;
+    //   document.getElementById('modalSummary').textContent = summary;
+    //   document.getElementById('modal').style.display = 'flex';
+    // }
 
-    function closeModal() {
-      document.getElementById('modal').style.display = 'none';
-    }
+    // function closeModal() {
+    //   document.getElementById('modal').style.display = 'none';
+    // }
 
-    renderPosts();
+    // renderPosts();
     function toggleDarkMode() {
   document.body.classList.toggle("dark-mode");
 
@@ -307,6 +294,31 @@ body.dark-mode .modal-content {
     icon.classList.add("fa-moon");
   }
 }
+async function fetchPosts() {
+  try {
+    const res = await fetch('http://localhost:3000/api/posts');
+    const posts = await res.json();
+    renderPosts(posts);
+  } catch (error) {
+    console.error("Lỗi lấy bài viết:", error);
+  }
+}
+
+function renderPosts(posts) {
+  const container = document.getElementById("blogCardsContainer");
+  container.innerHTML = posts.map(post => `
+    <div class="card">
+      <img src="${post.img || 'default.jpg'}" onclick="openModal('${post.title}', '${post.summary}')">
+      <div class="card-body">
+        <h3>${post.title}</h3>
+        <p>${post.summary}</p>
+      </div>
+      <button onclick="showFullPost('${post.title}')">Đọc thêm</button>
+    </div>
+  `).join('');
+}
+
+fetchPosts();
   </script>
 
 
