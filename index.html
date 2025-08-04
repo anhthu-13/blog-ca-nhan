@@ -250,8 +250,26 @@ body.dark-mode .modal-content {
       <p id="modalSummary"></p>
     </div>
   </div>
+<!-- Form cập nhật -->
+<div id="updateForm" style="display: none; position: fixed; top: 0; left:0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center;">
+  <div style="background: white; padding: 30px; border-radius: 10px; width: 500px; position: relative;">
+    <h3>Cập nhật bài viết</h3>
+    <input type="hidden" id="updateId">
+    <label>Tiêu đề:</label>
+    <input type="text" id="updateTitle" style="width: 100%; padding: 8px;">
+    <label>Tóm tắt:</label>
+    <textarea id="updateSummary" style="width: 100%; padding: 8px;"></textarea>
+    <label>Nội dung chi tiết:</label>
+    <textarea id="updateContent" style="width: 100%; padding: 8px;" rows="5"></textarea>
+    <br><br>
+    <button onclick="submitUpdate()">Lưu</button>
+    <button onclick="document.getElementById('updateForm').style.display='none'">Huỷ</button>
+  </div>
+</div>
 
   <script>
+
+  let allPosts = [];
 
     function createPostCard(post) {
       return `
@@ -271,15 +289,20 @@ body.dark-mode .modal-content {
     //   container.innerHTML = postsData.map(createPostCard).join('');
     // }
 
-    // function openModal(title, summary) {
-    //   document.getElementById('modalTitle').textContent = title;
-    //   document.getElementById('modalSummary').textContent = summary;
-    //   document.getElementById('modal').style.display = 'flex';
-    // }
+    function openModal(title) {
+  const post = allPosts.find(p => p.title === title);
+  if (!post) return;
 
-    // function closeModal() {
-    //   document.getElementById('modal').style.display = 'none';
-    // }
+  document.getElementById('modalTitle').textContent = post.title;
+  document.getElementById('modalSummary').textContent = post.content || post.summary;
+  document.getElementById('modal').style.display = 'flex';
+}
+
+
+
+     function closeModal() {
+      document.getElementById('modal').style.display = 'none';
+     }
 
     // renderPosts();
     function toggleDarkMode() {
@@ -298,27 +321,73 @@ async function fetchPosts() {
   try {
     const res = await fetch('http://localhost:3000/api/posts');
     const posts = await res.json();
+    allPosts = posts; // lưu vào biến toàn cục
+    debugger;
     renderPosts(posts);
   } catch (error) {
     console.error("Lỗi lấy bài viết:", error);
   }
 }
 
+
 function renderPosts(posts) {
   const container = document.getElementById("blogCardsContainer");
   container.innerHTML = posts.map(post => `
     <div class="card">
-      <img src="${post.img || 'default.jpg'}" onclick="openModal('${post.title}', '${post.summary}')">
+      <img src="${post.img || 'default.jpg'}" onclick="openModal('${post.title}')">
       <div class="card-body">
         <h3>${post.title}</h3>
         <p>${post.summary}</p>
       </div>
-      <button onclick="showFullPost('${post.title}')">Đọc thêm</button>
+      <button onclick="openModal('${post.title}')">Đọc thêm</button>
+      <button onclick="showUpdateForm('${post._id}')">Cập nhật</button>
     </div>
   `).join('');
 }
 
+
+
+
 fetchPosts();
+function showUpdateForm(id) {
+  const post = allPosts.find(p => p._id === id);
+  if (!post) return;
+
+  document.getElementById("updateId").value = post._id;
+  document.getElementById("updateTitle").value = post.title;
+  document.getElementById("updateSummary").value = post.summary;
+  document.getElementById("updateContent").value = post.content || "";
+  document.getElementById("updateForm").style.display = "flex";
+}
+
+async function submitUpdate() {
+  const id = document.getElementById("updateId").value;
+  const title = document.getElementById("updateTitle").value;
+  const summary = document.getElementById("updateSummary").value;
+  const content = document.getElementById("updateContent").value;
+
+  try {
+  const res = await fetch(`http://localhost:3000/api/posts/${id}`, {
+  method: "PUT",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({ title, summary, content })
+});
+
+    if (res.ok) {
+      alert("Cập nhật thành công!");
+      document.getElementById("updateForm").style.display = "none";
+      fetchPosts(); // Reload lại danh sách bài viết
+    } else {
+      alert("Cập nhật thất bại.");
+    }
+  } catch (error) {
+    console.error("Lỗi cập nhật:", error);
+    alert("Lỗi server khi cập nhật.");
+  }
+}
+
   </script>
 
 
